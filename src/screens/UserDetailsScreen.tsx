@@ -1,12 +1,13 @@
 import React from 'react';
-import {View, Text} from 'react-native';
+import {View} from 'react-native';
 import InitialHeader from '../components/InitialHeader';
+import UserDetailsForm from '../forms/UserDetailsForm';
 
 const UserDetailsScreen = () => {
   return (
-    <View>
+    <View style={{flex: 1}}>
       <InitialHeader title="A little about yourself" subTitle="hello" />
-      <Text>UserDetailsScreen</Text>
+      <UserDetailsForm />
     </View>
   );
 };

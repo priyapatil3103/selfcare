@@ -3,4 +3,6 @@ export type RootStackParamList = {
   start: undefined;
   userDetails: undefined;
   signIn: undefined;
+  signUp: undefined;
+  thankyou: undefined;
 };
