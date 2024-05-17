@@ -1,19 +1,19 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {View} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import SignUpForm from '../forms/SignUpForm';
 import InitialHeader from '../components/InitialHeader';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from '../types';
+
+type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
 
 const SignUpScreen = () => {
-  useEffect(() => {
-    AsyncStorage.getItem('userDetails').then(val => {
-      console.log(JSON.parse(val));
-    });
-  }, []);
+  const navigation = useNavigation<NavigationProps>();
   return (
     <View style={{flex: 1}}>
       <InitialHeader title="Sign Up" />
-      <SignUpForm />
+      <SignUpForm navigation={navigation} />
     </View>
   );
 };

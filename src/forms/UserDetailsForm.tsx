@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {View, StyleSheet, Text, TouchableOpacity} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+
 import {useForm, Controller} from 'react-hook-form';
 import {useNavigation} from '@react-navigation/native';
 import Male from '../images/svg/maleicon.svg';
@@ -15,7 +16,6 @@ type FormData = {gender: 'female' | 'male'; dob: string; location: string};
 type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
 
 const GenderButtons = ({onChange, value}) => {
-  console.log(value);
   return (
     <View
       style={{
@@ -75,12 +75,15 @@ const UserDetailsForm = () => {
   const {
     control,
     handleSubmit,
-    // formState: {errors},
+    formState: {errors},
   } = useForm<FormData>({
     defaultValues: {gender: 'male', dob: '', location: ''},
   });
 
+  console.log(errors);
+
   const onSubmit = (val: FormData) => {
+    console.log('v', val);
     setDisabled(true);
     AsyncStorage.setItem('userDetails', JSON.stringify(val))
       .then(() => {
@@ -108,19 +111,21 @@ const UserDetailsForm = () => {
           )}
           name="gender"
         />
-        <Controller
-          control={control}
-          render={({field: {onChange, value}}) => (
-            <Input
-              name="Your birthday"
-              placeholder="Min8 cyfr"
-              onChangeText={value => onChange(value)}
-              value={value}
-              labelStyle={styles.label}
-            />
-          )}
-          name="dob"
-        />
+        <View>
+          <Controller
+            control={control}
+            render={({field: {onChange, value}}) => (
+              <Input
+                name="Your birthday"
+                placeholder="Min8 cyfr"
+                onChangeText={value => onChange(value)}
+                value={value}
+                labelStyle={styles.label}
+              />
+            )}
+            name="dob"
+          />
+        </View>
         <Controller
           control={control}
           render={({field: {onChange, value}}) => (

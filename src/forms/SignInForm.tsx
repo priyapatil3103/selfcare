@@ -6,6 +6,7 @@ import {useForm, Controller} from 'react-hook-form';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import {RootStackParamList} from '../types';
+import axios from 'axios';
 
 type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
 type FormData = {email: string; password: string};
@@ -22,8 +23,15 @@ const SignInForm = () => {
   });
 
   const onSubmit = (data: FormData) => {
-    // Handle form submission here
-    console.log(data);
+    axios
+      .post('http://192.168.31.242:3005/auth/login', {
+        email: data.email,
+        password: data.password,
+      })
+      .then(() => {
+        navigation.navigate('main');
+      })
+      .catch(err => console.log(err.message));
   };
 
   return (
@@ -113,6 +121,7 @@ const SignInForm = () => {
 const styles = StyleSheet.create({
   error: {
     color: 'red',
+    marginBottom: 10,
   },
 });
 
