@@ -11,6 +11,7 @@ import {colors} from '../utils/global';
 type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
 const StartScreen = () => {
   const navigation = useNavigation<NavigationProps>();
+
   return (
     <View
       style={{

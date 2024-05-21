@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {View, StyleSheet, Text, TouchableOpacity} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {useForm, Controller} from 'react-hook-form';
 import {useNavigation} from '@react-navigation/native';
 import Male from '../images/svg/maleicon.svg';
@@ -11,8 +11,13 @@ import Button from '../components/Button';
 import {colors} from '../utils/global';
 import Input from '../components/Input';
 import {RootStackParamList} from '../types';
+import dayjs from 'dayjs';
 
-type FormData = {gender: 'female' | 'male'; dob: string; location: string};
+type FormData = {
+  gender: 'female' | 'male';
+  dob: string | Date;
+  location: string;
+};
 type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
 
 const GenderButtons = ({onChange, value}) => {
@@ -71,13 +76,15 @@ const UserDetailsForm = () => {
   const navigation = useNavigation<NavigationProps>();
 
   const [disabled, setDisabled] = useState<boolean>(false);
+  const [isDatePicker, setDatePicker] = useState(false);
 
   const {
     control,
     handleSubmit,
     formState: {errors},
+    watch,
   } = useForm<FormData>({
-    defaultValues: {gender: 'male', dob: '', location: ''},
+    defaultValues: {gender: 'male', dob: dayjs(), location: ''},
   });
 
   console.log(errors);
@@ -95,6 +102,8 @@ const UserDetailsForm = () => {
       });
   };
 
+  const date = watch('dob');
+  console.log('d', date);
   return (
     <View
       style={{
@@ -114,15 +123,47 @@ const UserDetailsForm = () => {
         <View>
           <Controller
             control={control}
-            render={({field: {onChange, value}}) => (
-              <Input
-                name="Your birthday"
-                placeholder="Min8 cyfr"
-                onChangeText={value => onChange(value)}
-                value={value}
-                labelStyle={styles.label}
-              />
-            )}
+            render={({field: {onChange, value}}) => {
+              const date = dayjs(value).format('DD/MM/YYYY').split('/');
+
+              return (
+                <>
+                  <Text style={styles.label}>Your birthday</Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setDatePicker(true);
+                    }}
+                    style={{
+                      flexDirection: 'row',
+                      marginBottom: 10,
+                    }}>
+                    <View>
+                      <Text style={{color: 'grey'}}>Day:</Text>
+                      <Text style={styles.value}>{date[0]}</Text>
+                    </View>
+                    <View>
+                      <Text style={{color: 'grey'}}>Month:</Text>
+                      <Text style={styles.value}>{date[1]}</Text>
+                    </View>
+                    <View>
+                      <Text style={{color: 'grey'}}>Year:</Text>
+                      <Text style={styles.value}>{date[2]}</Text>
+                    </View>
+                  </TouchableOpacity>
+                  <DateTimePickerModal
+                    isVisible={isDatePicker}
+                    mode="date"
+                    onConfirm={date => {
+                      onChange(date);
+                      setDatePicker(false);
+                    }}
+                    onCancel={() => {
+                      setDatePicker(false);
+                    }}
+                  />
+                </>
+              );
+            }}
             name="dob"
           />
         </View>
@@ -131,7 +172,7 @@ const UserDetailsForm = () => {
           render={({field: {onChange, value}}) => (
             <Input
               name="Location"
-              placeholder="Min8 cyfr"
+              placeholder="Pune"
               onChangeText={value => onChange(value)}
               value={value}
               labelStyle={styles.label}
@@ -153,7 +194,7 @@ const UserDetailsForm = () => {
 };
 
 const styles = StyleSheet.create({
-  label: {fontSize: 18, color: 'black', fontWeight: '400'},
+  label: {fontSize: 20, color: 'black', fontWeight: 'bold', marginBottom: 10},
   genderText: {color: colors.green, marginLeft: 20, fontSize: 20},
   container: {
     backgroundColor: colors.green,
@@ -168,6 +209,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 5,
+  },
+  value: {
+    color: 'black',
+    padding: 10,
+    borderWidth: 1,
+    marginRight: 10,
+    borderRadius: 10,
+    marginTop: 5,
+    paddingRight: 25,
   },
 });
 
