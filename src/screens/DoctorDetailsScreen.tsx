@@ -1,4 +1,3 @@
-import axios from 'axios';
 import React, {useCallback, useEffect, useState} from 'react';
 import {
   FlatList,
@@ -21,6 +20,7 @@ import Details from '../components/Details';
 import {colors} from '../utils/global';
 
 import {HomeStackParamList} from '../types';
+import api from '../api';
 
 type NavigationProps = NativeStackNavigationProp<HomeStackParamList>;
 
@@ -43,25 +43,73 @@ const DoctorDetailsScreen = () => {
     | undefined
   >(undefined);
 
-  const [selectedDate, setSelectedDate] = useState<string | undefined>(
-    undefined,
-  );
-  const [selectedSlot, setSelectedSlot] = useState<number | undefined>(
-    undefined,
-  );
+  const {id, selectedDate, selectedSlot, appointmentId} = routes.params;
 
-  const {id} = routes.params;
+  const [date, setDate] = useState<string | undefined>(selectedDate);
+  const [slot, setSlot] = useState<number | undefined>(selectedSlot);
+
   console.log('id', id);
+
+  const appointmentButton = (title: string, calledFor: 'book' | 'cancel') => {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          if (calledFor === 'book') {
+            navigation.navigate('appointmentConfirm', {
+              docData,
+              selectedDate,
+              selectedSlot,
+            });
+          } else {
+            console.log('appointmentId', appointmentId);
+            api
+              .post(`/appointment/${appointmentId}`)
+              .then(res => {
+                console.log('rrrr', res);
+                navigation.navigate('home');
+              })
+              .catch(err => {
+                console.log(err);
+              });
+          }
+        }}
+        style={{
+          flexDirection: 'row',
+          backgroundColor: calledFor === 'book' ? colors.green : 'black',
+          alignItems: 'center',
+          margin: 10,
+          borderRadius: 15,
+          paddingVertical: 15,
+          justifyContent: 'space-between',
+        }}>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <Rectangle style={{marginLeft: 15}} />
+          <Text
+            style={{
+              color: 'white',
+              marginLeft: 10,
+              fontWeight: 'bold',
+            }}>
+            {title}
+          </Text>
+        </View>
+        <View style={{flexDirection: 'row', marginRight: 15}}>
+          <Icon name="angle-right" size={20} color="white" />
+          <Icon
+            name="angle-right"
+            size={20}
+            color="white"
+            style={{marginLeft: 5}}
+          />
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   const getDoctorDetails = useCallback(async () => {
     if (id) {
       try {
-        const res = await axios.get(`http://192.168.31.242:3005/doctor/${id}`, {
-          headers: {
-            Authorization:
-              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN1bWl0LnN1dGFyQGdsb2JhbnQuY29tIiwicGFzc3dvcmQiOiJUZXN0QDEyMyIsImlhdCI6MTY4MzYxNTA3MiwiZXhwIjoxNjgzNjU4MjcyfQ.KnEpye5QA6C_4tbm3b-EU_YyyMAH1Ule2oiS4xD7PoE',
-          },
-        });
+        const res = await api.get(`http://192.168.31.242:3005/doctor/${id}`);
         console.log('res', res);
         setDocData(res.data);
       } catch (err) {
@@ -93,9 +141,14 @@ const DoctorDetailsScreen = () => {
           }}>
           <TouchableOpacity
             onPress={() => {
+              console.log('a');
               navigation.goBack();
             }}
-            style={{flexDirection: 'row', alignItems: 'center'}}>
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              padding: 15,
+            }}>
             <Icon name="chevron-left" style={{marginRight: 10}} />
             <Text style={{color: 'black'}}>Back</Text>
           </TouchableOpacity>
@@ -141,6 +194,12 @@ const DoctorDetailsScreen = () => {
           </View>
         </View>
 
+        {appointmentId ? (
+          <TouchableOpacity>
+            {appointmentButton('Cancel a Visit', 'cancel')}
+          </TouchableOpacity>
+        ) : null}
+
         <View
           style={{
             flexDirection: 'row',
@@ -161,18 +220,17 @@ const DoctorDetailsScreen = () => {
               keyExtractor={item => item}
               renderItem={({item}) => {
                 const month = dayjs(item).format('MMM');
-                console.log(month);
-                const date = dayjs(item).get('date');
+                const dateToDisplay = dayjs(item).get('date');
+                console.log('ddddd', date);
                 return (
                   <TouchableOpacity
                     onPress={() => {
-                      setSelectedDate(item);
+                      setDate(item);
                     }}
                     style={{
                       flex: 1,
                       marginHorizontal: 10,
-                      backgroundColor:
-                        selectedDate === item ? colors.green : 'white',
+                      backgroundColor: date === item ? colors.green : 'white',
                       borderRadius: 10,
                       padding: 20,
                     }}>
@@ -180,14 +238,14 @@ const DoctorDetailsScreen = () => {
                       style={{
                         textAlign: 'center',
                         fontWeight: 'bold',
-                        color: selectedDate === item ? 'white' : 'black',
+                        color: date === item ? 'white' : 'black',
                       }}>
-                      {date}
+                      {dateToDisplay}
                     </Text>
                     <Text
                       style={{
                         marginTop: 10,
-                        color: selectedDate === item ? 'white' : 'black',
+                        color: date === item ? 'white' : 'black',
                       }}>
                       {month}
                     </Text>
@@ -197,7 +255,7 @@ const DoctorDetailsScreen = () => {
               showsHorizontalScrollIndicator={false}
             />
           </View>
-          {selectedDate ? (
+          {date ? (
             <View>
               <Text style={styles.title}>Time Slots</Text>
               <View
@@ -211,17 +269,16 @@ const DoctorDetailsScreen = () => {
                   return (
                     <TouchableOpacity
                       style={{
-                        backgroundColor:
-                          selectedSlot === item ? colors.green : 'white',
+                        backgroundColor: slot === item ? colors.green : 'white',
                         borderRadius: 10,
                         padding: 15,
                       }}
                       onPress={() => {
-                        setSelectedSlot(item);
+                        setSlot(item);
                       }}>
                       <Text
                         style={{
-                          color: selectedSlot === item ? 'white' : 'black',
+                          color: slot === item ? 'white' : 'black',
                         }}>
                         {item}
                       </Text>
@@ -233,42 +290,9 @@ const DoctorDetailsScreen = () => {
           ) : null}
 
           <>
-            {selectedDate && selectedSlot ? (
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate('appointmentConfirm', {docData});
-                }}
-                style={{
-                  flexDirection: 'row',
-                  backgroundColor: colors.green,
-                  alignItems: 'center',
-                  margin: 10,
-                  borderRadius: 15,
-                  paddingVertical: 15,
-                  justifyContent: 'space-between',
-                }}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Rectangle style={{marginLeft: 15}} />
-                  <Text
-                    style={{
-                      color: 'white',
-                      marginLeft: 10,
-                      fontWeight: 'bold',
-                    }}>
-                    Make appointment
-                  </Text>
-                </View>
-                <View style={{flexDirection: 'row', marginRight: 15}}>
-                  <Icon name="angle-right" size={20} color="white" />
-                  <Icon
-                    name="angle-right"
-                    size={20}
-                    color="white"
-                    style={{marginLeft: 5}}
-                  />
-                </View>
-              </TouchableOpacity>
-            ) : null}
+            {date && slot && !appointmentId
+              ? appointmentButton('Make an appointment', 'book')
+              : null}
           </>
 
           <Text style={styles.title}>About a doctor</Text>

@@ -25,10 +25,19 @@ export type RootStackParamList = {
 
 export type HomeStackParamList = {
   home: undefined;
-  doctorDetails: {id: number};
+  doctorDetails: {
+    id: number;
+    selectedDate: string | undefined;
+    selectedSlot: number | undefined;
+    appointmentId?: number;
+  };
   appointmentConfirm: {
     docData: DocData;
+    selectedDate: string;
+    selectedSlot: number;
   };
+  payment: {id: number; selectedDate: string; selectedSlot: number};
+  thankyou: undefined;
 };
 
 export type BottomTabParamsList = {homeTab: undefined; user: undefined};

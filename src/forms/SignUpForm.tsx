@@ -1,7 +1,6 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import {useForm, Controller} from 'react-hook-form';
-import axios from 'axios';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import {CheckBox} from '@rneui/themed';
@@ -10,6 +9,7 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useUser} from '../utils/userAuth';
+import api from '../api';
 
 type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
 
@@ -40,10 +40,10 @@ const SignUpForm: React.FC<{navigation: NavigationProps}> = ({navigation}) => {
     if (userData) {
       const userDeatils = JSON.parse(userData);
 
-      console.log('userData', userData);
+      console.log('userData', userDeatils);
       console.log(data);
-      axios
-        .post('http://10.223.48.174:3005/auth/register', {
+      api
+        .post('/auth/register', {
           name: data.fullName,
           email: data.email,
           password: data.password,
@@ -56,14 +56,13 @@ const SignUpForm: React.FC<{navigation: NavigationProps}> = ({navigation}) => {
           },
         })
         .then(res => {
-          console.log('res', res);
-          console.log('res', res.data);
+          console.log('res signup', res.data);
           const {id, name, email} = res.data;
           setUserDetails({id: id, name, email});
           navigation.navigate('otp');
         })
         .catch(err => {
-          console.log(err);
+          console.log(err.message);
         });
     }
   };
@@ -135,7 +134,6 @@ const SignUpForm: React.FC<{navigation: NavigationProps}> = ({navigation}) => {
         <Controller
           control={control}
           render={({field: {onChange, value}}) => {
-            console.log('val', value);
             return (
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <CheckBox checked={value} onPress={() => onChange(!value)} />

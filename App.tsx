@@ -11,11 +11,13 @@ import ThankYouScreen from './src/screens/ThankYouScreen';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {ThemeProvider} from '@rneui/themed';
 import OTPScreen from './src/screens/OTPScreen';
-import {UserProvider} from './src/utils/userAuth';
+import {UserProvider, useUser} from './src/utils/userAuth';
 import BottomTab from './src/screens/BottomNavigation';
 
 const App = (): React.JSX.Element => {
   const Stack = createNativeStackNavigator<RootStackParamList>();
+  const user = useUser();
+  console.log(user);
 
   return (
     <SafeAreaProvider>
@@ -31,7 +33,6 @@ const App = (): React.JSX.Element => {
               <Stack.Screen name="signIn" component={SignInScreen} />
               <Stack.Screen name="signUp" component={SignUpScreen} />
               <Stack.Screen name="otp" component={OTPScreen} />
-              <Stack.Screen name="thankyou" component={ThankYouScreen} />
               <Stack.Screen name="main" component={BottomTab} />
             </Stack.Navigator>
           </NavigationContainer>

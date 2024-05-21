@@ -6,13 +6,16 @@ import {useForm, Controller} from 'react-hook-form';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import {RootStackParamList} from '../types';
-import axios from 'axios';
+import api from '../api';
+import {useUser} from '../utils/userAuth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
 type FormData = {email: string; password: string};
 
 const SignInForm = () => {
   const navigation = useNavigation<NavigationProps>();
+  const {setUserDetails} = useUser();
 
   const {
     control,
@@ -22,16 +25,19 @@ const SignInForm = () => {
     defaultValues: {email: '', password: ''},
   });
 
-  const onSubmit = (data: FormData) => {
-    axios
-      .post('http://192.168.31.242:3005/auth/login', {
-        email: data.email,
-        password: data.password,
-      })
-      .then(() => {
-        navigation.navigate('main');
-      })
-      .catch(err => console.log(err.message));
+  const onSubmit = async (data: FormData) => {
+    const res = await api.post('/auth/login', {
+      email: data.email,
+      password: data.password,
+    });
+
+    await AsyncStorage.setItem('userToken', res.data.access_token);
+    setUserDetails({
+      id: res.data.id,
+      name: res.data.name,
+      email: res.data.email,
+    });
+    navigation.navigate('main');
   };
 
   return (

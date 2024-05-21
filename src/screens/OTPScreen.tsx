@@ -5,8 +5,9 @@ import {useNavigation} from '@react-navigation/native';
 import {RootStackParamList} from '../types';
 import Button from '../components/Button';
 import InitialHeader from '../components/InitialHeader';
-import axios from 'axios';
 import {useUser} from '../utils/userAuth';
+import api from '../api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
 
@@ -28,13 +29,15 @@ const OTPScreen = () => {
   };
 
   const verifyOtp = () => {
-    axios
+    api
       .post('http://192.168.31.242:3005/auth/verify', {
         userId: userDetails?.id,
         otp: otp.join('').toString(),
       })
-      .then(() => {
-        navigation.navigate('main');
+      .then(res => {
+        AsyncStorage.setItem('userToken', res.data.access_token).then(() => {
+          navigation.navigate('main');
+        });
       })
       .catch(err => {
         console.log(err);

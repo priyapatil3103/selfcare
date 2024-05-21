@@ -1,10 +1,16 @@
 import React from 'react';
 import {Text, TouchableOpacity, View, StyleSheet} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {colors} from '../utils/global';
 import Check from '../images/svg/Check.svg';
 import Thank from '../images/svg/thankyou.svg';
+import {HomeStackParamList} from '../types';
+
+type NavigationProps = NativeStackNavigationProp<HomeStackParamList>;
 
 const ThankYouScreen: React.FC = () => {
+  const navigation = useNavigation<NavigationProps>();
   return (
     <View
       style={{
@@ -25,7 +31,11 @@ const ThankYouScreen: React.FC = () => {
         Your visit has been successfully reserved, please pay for it to get an
         appointment with selected doctor
       </Text>
-      <TouchableOpacity style={{position: 'absolute', bottom: 20}}>
+      <TouchableOpacity
+        style={{position: 'absolute', bottom: 20}}
+        onPress={() => {
+          navigation.navigate('home');
+        }}>
         <Text style={[styles.text, {textDecorationLine: 'underline'}]}>
           Go to Home
         </Text>
