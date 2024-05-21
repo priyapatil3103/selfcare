@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import RNUpiPayment from 'react-native-upi-payment';
 import {CheckBox} from '@rneui/base';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -32,12 +33,15 @@ const PaymentScreen = () => {
       }}>
       <View>
         <TouchableOpacity
-          onPress={() => {}}
+          onPress={() => {
+            navigation.goBack();
+          }}
           style={{
             flexDirection: 'row',
             alignItems: 'center',
             marginTop: 20,
             marginLeft: 10,
+            padding: 10,
           }}>
           <Icon name="chevron-left" style={{marginRight: 10}} size={20} />
           <Text style={{color: 'black', fontSize: 20}}>Back</Text>
@@ -104,6 +108,24 @@ const PaymentScreen = () => {
               );
               if (paymentOption === 'visit') {
                 navigation.navigate('thankyou');
+              } else {
+                console.log('called');
+                RNUpiPayment.initializePayment(
+                  {
+                    vpa: 'john@upi', // or can be john@ybl or mobileNo@upi
+                    payeeName: 'John Doe',
+                    amount: '1',
+                    transactionRef: 'aasf-332-aoei-fn',
+                  },
+                  function successCallback(data) {
+                    // do whatever with the data
+                    console.log('d', data);
+                  },
+
+                  function failureCallback(error) {
+                    console.log('a', error);
+                  },
+                );
               }
             } catch (err) {
               console.log(err);

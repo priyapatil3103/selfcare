@@ -26,6 +26,7 @@
     "react-native-screens": "^3.31.1",
     "react-native-svg": "^15.2.0",
     "react-native-svg-transformer": "^1.3.0",
+    "react-native-upi-payment": "^1.0.5",
     "react-native-vector-icons": "^10.1.0"
   },
   "devDependencies": {
