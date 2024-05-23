@@ -38,6 +38,7 @@ export type HomeStackParamList = {
   };
   payment: {id: number; selectedDate: string; selectedSlot: number};
   thankyou: undefined;
+  appointmentList: undefined;
 };
 
 export type BottomTabParamsList = {homeTab: undefined; user: undefined};

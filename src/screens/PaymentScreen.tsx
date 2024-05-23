@@ -87,24 +87,14 @@ const PaymentScreen = () => {
               paymentMode: paymentOption === 'visit' ? 'Pay on Visit' : 'UPI',
             });
             try {
-              await api.post(
-                'http://192.168.31.242:3005/appointment',
-                {
-                  userId: userDetails?.id,
-                  doctorId: id,
-                  date: selectedDate,
-                  time: selectedSlot,
-                  status: 'active',
-                  paymentMode:
-                    paymentOption === 'visit' ? 'Pay on Visit' : 'UPI',
-                },
-                {
-                  headers: {
-                    Authorization:
-                      'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN1bWl0LnN1dGFyQGdsb2JhbnQuY29tIiwicGFzc3dvcmQiOiJUZXN0QDEyMyIsImlhdCI6MTY4MzYxNTA3MiwiZXhwIjoxNjgzNjU4MjcyfQ.KnEpye5QA6C_4tbm3b-EU_YyyMAH1Ule2oiS4xD7PoE',
-                  },
-                },
-              );
+              await api.post('appointment', {
+                userId: userDetails?.id,
+                doctorId: id,
+                date: selectedDate,
+                time: selectedSlot,
+                status: 'active',
+                paymentMode: paymentOption === 'visit' ? 'Pay on Visit' : 'UPI',
+              });
               if (paymentOption === 'visit') {
                 navigation.navigate('thankyou');
               } else {

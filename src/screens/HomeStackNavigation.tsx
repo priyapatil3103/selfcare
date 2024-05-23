@@ -6,6 +6,7 @@ import {HomeStackParamList} from '../types';
 import AppointmentConfirmationScreen from './AppointmentConfirmationScreen';
 import PaymentScreen from './PaymentScreen';
 import ThankYouScreen from './ThankYouScreen';
+import AppointmentListScreen from './AppointmentListScreen';
 
 const HomeStackNavigation = () => {
   const HomeStack = createNativeStackNavigator<HomeStackParamList>();
@@ -21,6 +22,10 @@ const HomeStackNavigation = () => {
       <HomeStack.Screen
         name="appointmentConfirm"
         component={AppointmentConfirmationScreen}
+      />
+      <HomeStack.Screen
+        name="appointmentList"
+        component={AppointmentListScreen}
       />
       <HomeStack.Screen name="payment" component={PaymentScreen} />
       <HomeStack.Screen name="thankyou" component={ThankYouScreen} />

@@ -49,7 +49,7 @@ const AppointmentConfirmationScreen = () => {
             justifyContent: 'space-between',
             alignItems: 'center',
             marginTop: 30,
-            margin: 10,
+            marginHorizontal: 20,
           }}>
           <Text style={styles.title}>Fees</Text>
           <Text style={styles.title}>

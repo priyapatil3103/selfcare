@@ -10,6 +10,7 @@ import {FlatList} from 'react-native';
 import Doctor from '../images/svg/female.svg';
 import {HomeStackParamList} from '../types';
 import api from '../api';
+import dayjs from 'dayjs';
 
 type NavigationProps = NativeStackNavigationProp<HomeStackParamList>;
 const HomeScreen = () => {
@@ -130,6 +131,7 @@ const HomeScreen = () => {
         {selectedCategories.map(item => {
           return (
             <Text
+              key={item}
               style={{
                 backgroundColor: '#EFF2F1',
                 borderRadius: 10,
@@ -143,181 +145,225 @@ const HomeScreen = () => {
         })}
       </View>
       <View>
-        {appointments ? (
+        {appointments.length > 0 ? (
           <>
             <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
+                marginTop: 10,
               }}>
               <Text style={styles.title}>Recent</Text>
-              <Text>See all</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate('appointmentList');
+                }}>
+                <Text>See all</Text>
+              </TouchableOpacity>
             </View>
-            {appointments.map((item, index) => {
-              console.log('item', item);
-              if (index < 2) {
-                return (
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate('doctorDetails', {
-                        id: item.doctorId,
-                        selectedDate: item.date,
-                        selectedSlot: item.time,
-                        appointmentId: item.id,
-                      });
-                    }}
-                    style={{
-                      backgroundColor: '#6295E2',
-                      padding: 10,
-                      borderRadius: 10,
-                      margin: 10,
-                    }}>
-                    <View
+            {appointments
+              .sort((a, b) => dayjs(a.date) - dayjs(b.date))
+              .map((item, index) => {
+                console.log('item', item);
+                if (index < 2) {
+                  return (
+                    <TouchableOpacity
+                      key={item.id}
+                      onPress={() => {
+                        navigation.navigate('doctorDetails', {
+                          id: item.doctorId,
+                          selectedDate: item.date,
+                          selectedSlot: item.time,
+                          appointmentId: item.appointmentId,
+                        });
+                      }}
                       style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                      }}>
-                      <Text style={{color: 'white'}}>{item.name}</Text>
-                      <Text style={{color: 'white'}}>{item.ratings}</Text>
-                    </View>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginTop: 10,
+                        backgroundColor: '#6295E2',
+                        padding: 10,
+                        borderRadius: 10,
+                        margin: 10,
                       }}>
                       <View
                         style={{
                           flexDirection: 'row',
-                          alignItems: 'center',
+                          justifyContent: 'space-between',
                         }}>
-                        <Icon name="calendar" color="white" />
-                        <Text style={styles.appointmentText}>{item.date}</Text>
-                        <Icon name="clock" color="white" />
-                        <Text style={styles.appointmentText}>{item.time}</Text>
+                        <Text style={{color: 'white'}}>{item.name}</Text>
+                        <Text style={{color: 'white'}}>{item.ratings}</Text>
                       </View>
                       <View
                         style={{
                           flexDirection: 'row',
+                          justifyContent: 'space-between',
                           alignItems: 'center',
-                          justifyContent: 'flex-end',
+                          marginTop: 10,
                         }}>
-                        <Text style={{color: 'white'}}>{item.currency}</Text>
-                        <Text style={{marginLeft: 5, color: 'white'}}>
-                          {item.fees}
-                        </Text>
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                          }}>
+                          <Icon name="calendar" color="white" />
+                          <Text style={styles.appointmentText}>
+                            {item.date}
+                          </Text>
+                          <Icon name="clock" color="white" />
+                          <Text style={styles.appointmentText}>
+                            {item.time}
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'flex-end',
+                          }}>
+                          <Text style={{color: 'white'}}>{item.currency}</Text>
+                          <Text style={{marginLeft: 5, color: 'white'}}>
+                            {item.fees}
+                          </Text>
+                        </View>
                       </View>
-                    </View>
-                  </TouchableOpacity>
-                );
-              }
-            })}
+                    </TouchableOpacity>
+                  );
+                }
+              })}
           </>
         ) : null}
       </View>
-
-      <Text style={styles.title}>Categories</Text>
-      <FlatList
-        showsHorizontalScrollIndicator={false}
-        horizontal
-        data={doctorTypes}
-        renderItem={({index, item}) => {
-          const bgColors = ['#FFE2DC', '#E0EAF9', '#FFF7DC'];
-          const iconColors = ['#FF6C52', '#6295E2', '#F6C25D'];
-          return (
-            <TouchableOpacity
-              onPress={() => {
-                if (selectedCategories.includes(item.name)) {
-                  setSelectedCategories(
-                    selectedCategories.filter(i => i !== item.name),
-                  );
-                } else {
-                  setSelectedCategories([...selectedCategories, item.name]);
-                }
-              }}
-              style={{
-                backgroundColor: 'white',
-                margin: 10,
-                width: 130,
-                alignContent: 'center',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 20,
-                zIndex: 1,
-              }}>
-              <Icon
-                name={item.icon}
-                color={iconColors[index % bgColors.length]}
-                style={{
-                  marginBottom: 10,
-                  backgroundColor: bgColors[index % bgColors.length],
-                  padding: 10,
-                  paddingHorizontal: 15,
-                  borderRadius: 10,
+      <View>
+        <Text style={styles.title}>Categories</Text>
+        <FlatList
+          showsHorizontalScrollIndicator={false}
+          horizontal
+          data={doctorTypes}
+          renderItem={({index, item}) => {
+            const bgColors = ['#FFE2DC', '#E0EAF9', '#FFF7DC'];
+            const iconColors = ['#FF6C52', '#6295E2', '#F6C25D'];
+            return (
+              <TouchableOpacity
+                onPress={() => {
+                  if (selectedCategories.includes(item.name)) {
+                    setSelectedCategories(
+                      selectedCategories.filter(i => i !== item.name),
+                    );
+                  } else {
+                    setSelectedCategories([...selectedCategories, item.name]);
+                  }
                 }}
-              />
-
-              <Text
                 style={{
-                  textAlign: 'center',
-                  color: 'black',
-                  fontWeight: 'semibold',
-                  fontSize: 12,
+                  backgroundColor: 'white',
+                  margin: 10,
+                  width: 130,
+                  height: 80,
+                  alignContent: 'center',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 20,
+                  zIndex: 1,
                 }}>
-                {item.name}
-              </Text>
-            </TouchableOpacity>
-          );
-        }}
-        keyExtractor={item => item.name}
-      />
+                <Icon
+                  name={item.icon}
+                  color={iconColors[index % bgColors.length]}
+                  style={{
+                    marginBottom: 10,
+                    backgroundColor: bgColors[index % bgColors.length],
+                    padding: 10,
+                    paddingHorizontal: 15,
+                    borderRadius: 10,
+                  }}
+                />
 
-      <Text style={styles.title}>Popular Doctors</Text>
-      <FlatList
-        showsVerticalScrollIndicator={false}
-        data={
-          selectedCategories.length > 0 || searchText
-            ? doctors.filter(item => {
-                return (
-                  selectedCategories.includes(item.type) ||
-                  item.type.toLowerCase() === searchText.toLowerCase()
-                );
-              })
-            : doctors
-        }
-        renderItem={({index, item}) => {
-          return (
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('doctorDetails', {
-                  id: item.id,
-                  selectedDate: undefined,
-                  selectedSlot: undefined,
-                  appointmentId: undefined,
-                });
-              }}
-              style={{
-                backgroundColor: 'white',
-                margin: 10,
-                borderRadius: 20,
-                zIndex: 1,
-                flexDirection: 'row',
-                padding: 10,
-                justifyContent: 'space-between',
-              }}>
-              <View style={{flexDirection: 'row'}}>
-                <Doctor width={50} height={50} />
-                <View style={{marginLeft: 10}}>
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    color: 'black',
+                    fontWeight: 'semibold',
+                    fontSize: 12,
+                  }}>
+                  {item.name}
+                </Text>
+              </TouchableOpacity>
+            );
+          }}
+          keyExtractor={item => item.name}
+        />
+      </View>
+      <View>
+        <Text style={styles.title}>Popular Doctors</Text>
+        <FlatList
+          ListEmptyComponent={() => (
+            <Text style={{margin: 10, textAlign: 'center', fontWeight: 'bold'}}>
+              No doctors with selected category. Please check other options.
+            </Text>
+          )}
+          showsVerticalScrollIndicator={false}
+          data={
+            selectedCategories.length > 0 || searchText
+              ? doctors.filter(item => {
+                  return (
+                    selectedCategories.includes(item.type) ||
+                    item.type.toLowerCase() === searchText.toLowerCase()
+                  );
+                })
+              : doctors
+          }
+          renderItem={({index, item}) => {
+            return (
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate('doctorDetails', {
+                    id: item.id,
+                    selectedDate: undefined,
+                    selectedSlot: undefined,
+                    appointmentId: undefined,
+                  });
+                }}
+                style={{
+                  backgroundColor: 'white',
+                  margin: 10,
+                  borderRadius: 20,
+                  zIndex: 1,
+                  flexDirection: 'row',
+                  padding: 10,
+                  justifyContent: 'space-between',
+                }}>
+                <View style={{flexDirection: 'row'}}>
+                  <Doctor width={50} height={50} />
+                  <View style={{marginLeft: 10}}>
+                    <Text
+                      style={{
+                        color: 'black',
+                        fontWeight: 'semibold',
+                        fontSize: 16,
+                      }}>
+                      {item.name}
+                    </Text>
+                    <Text
+                      style={{
+                        color: 'black',
+                        fontWeight: 'semibold',
+                        fontSize: 12,
+                        marginTop: 5,
+                      }}>
+                      {item.type}
+                    </Text>
+                  </View>
+                </View>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <Text
                     style={{
-                      color: 'black',
-                      fontWeight: 'semibold',
-                      fontSize: 16,
+                      fontSize: 14,
+                      color: 'grey',
                     }}>
-                    {item.name}
+                    ({item.patients} reviews)
                   </Text>
+                  <Icon
+                    style={{marginLeft: 10, marginTop: 2}}
+                    name="star"
+                    color="#F4A3EC"
+                  />
                   <Text
                     style={{
                       color: 'black',
@@ -325,38 +371,15 @@ const HomeScreen = () => {
                       fontSize: 12,
                       marginTop: 5,
                     }}>
-                    {item.type}
+                    {item.ratings}
                   </Text>
                 </View>
-              </View>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: 'grey',
-                  }}>
-                  ({item.patients} reviews)
-                </Text>
-                <Icon
-                  style={{marginLeft: 10, marginTop: 2}}
-                  name="star"
-                  color="#F4A3EC"
-                />
-                <Text
-                  style={{
-                    color: 'black',
-                    fontWeight: 'semibold',
-                    fontSize: 12,
-                    marginTop: 5,
-                  }}>
-                  {item.ratings}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          );
-        }}
-        keyExtractor={item => item.id}
-      />
+              </TouchableOpacity>
+            );
+          }}
+          keyExtractor={item => item.id}
+        />
+      </View>
     </View>
   );
 };

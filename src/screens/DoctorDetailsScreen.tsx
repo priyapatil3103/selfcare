@@ -60,8 +60,9 @@ const DoctorDetailsScreen = () => {
             });
           } else {
             api
-              .post(`/appointment/${appointmentId}`)
+              .post(`appointment/${appointmentId}`)
               .then(res => {
+                console.log('res', res);
                 navigation.navigate('home');
               })
               .catch(err => {
@@ -116,6 +117,18 @@ const DoctorDetailsScreen = () => {
   useEffect(() => {
     getDoctorDetails();
   }, [getDoctorDetails]);
+
+  useEffect(() => {
+    const subscribe = navigation.addListener('focus', () => {
+      if (!selectedDate && !selectedSlot) {
+        setDate(undefined);
+        setSlot(undefined);
+      }
+    });
+    return () => {
+      subscribe();
+    };
+  }, [navigation]);
 
   const dates = [];
 
