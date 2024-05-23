@@ -31,8 +31,6 @@ const HomeScreen = () => {
 
   const {userDetails} = useUser();
 
-  console.log('userDetails', userDetails);
-
   const fetchData = async () => {
     try {
       const res = await api.get('doctors-types');
@@ -56,7 +54,6 @@ const HomeScreen = () => {
         api
           .get(`appointments/${userDetails.id}`)
           .then(res => {
-            console.log('rrrr', res.data);
             setAppointments(res.data);
           })
           .catch(err => {
@@ -165,7 +162,6 @@ const HomeScreen = () => {
             {appointments
               .sort((a, b) => dayjs(a.date) - dayjs(b.date))
               .map((item, index) => {
-                console.log('item', item);
                 if (index < 2) {
                   return (
                     <TouchableOpacity

@@ -98,7 +98,6 @@ const PaymentScreen = () => {
               if (paymentOption === 'visit') {
                 navigation.navigate('thankyou');
               } else {
-                console.log('called');
                 RNUpiPayment.initializePayment(
                   {
                     vpa: 'john@upi', // or can be john@ybl or mobileNo@upi

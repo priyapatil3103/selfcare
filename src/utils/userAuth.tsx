@@ -29,7 +29,6 @@ export const UserProvider: FC = ({children}) => {
     // Load the authentication state from storage
     const loadAuthState = async () => {
       const savedState = await AsyncStorage.getItem('userDetails');
-      console.log('s', savedState);
       if (savedState !== null) {
         setUserDetails(JSON.parse(savedState));
       }

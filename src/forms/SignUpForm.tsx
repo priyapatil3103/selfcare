@@ -37,11 +37,9 @@ const SignUpForm: React.FC<{navigation: NavigationProps}> = ({navigation}) => {
   const onSubmit = async (data: FormData) => {
     const userData = await AsyncStorage.getItem('userDetails');
 
-    console.log('userData', userData);
-
     if (userData) {
       const userDeatils = JSON.parse(userData);
-      console.log('called', userDeatils);
+
       api
         .post('/auth/register', {
           name: data.fullName,
@@ -52,14 +50,12 @@ const SignUpForm: React.FC<{navigation: NavigationProps}> = ({navigation}) => {
           location: userDeatils.location,
         })
         .then(res => {
-          console.log('res', res);
           const {id, name, email, location} = res.data;
           setUserDetails({id: id, name, email, location});
           navigation.navigate('otp');
         })
         .catch(err => {
           console.log(err);
-          console.log(err.message);
         });
     }
   };
