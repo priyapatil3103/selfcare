@@ -3,13 +3,13 @@ import {View, StyleSheet, Text, TouchableOpacity} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import RNPickerSelect from 'react-native-picker-select';
 import {useForm, Controller} from 'react-hook-form';
 import {useNavigation} from '@react-navigation/native';
 import Male from '../images/svg/maleicon.svg';
 import Female from '../images/svg/female.svg';
 import Button from '../components/Button';
-import {colors} from '../utils/global';
-import Input from '../components/Input';
+import {colors, location} from '../utils/global';
 import {RootStackParamList} from '../types';
 import dayjs from 'dayjs';
 
@@ -74,7 +74,6 @@ const GenderButtons = ({onChange, value}) => {
 
 const UserDetailsForm = () => {
   const navigation = useNavigation<NavigationProps>();
-
   const [disabled, setDisabled] = useState<boolean>(false);
   const [isDatePicker, setDatePicker] = useState(false);
 
@@ -82,17 +81,17 @@ const UserDetailsForm = () => {
     control,
     handleSubmit,
     formState: {errors},
-    watch,
   } = useForm<FormData>({
     defaultValues: {gender: 'male', dob: dayjs(), location: ''},
   });
 
-  console.log(errors);
-
   const onSubmit = (val: FormData) => {
-    console.log('v', val);
+    const locationToPass = location.filter(item => item.name === val.location);
     setDisabled(true);
-    AsyncStorage.setItem('userDetails', JSON.stringify(val))
+    AsyncStorage.setItem(
+      'userDetails',
+      JSON.stringify({...val, location: locationToPass}),
+    )
       .then(() => {
         setDisabled(false);
         navigation.navigate('signIn');
@@ -102,8 +101,6 @@ const UserDetailsForm = () => {
       });
   };
 
-  const date = watch('dob');
-  console.log('d', date);
   return (
     <View
       style={{
@@ -112,7 +109,7 @@ const UserDetailsForm = () => {
         justifyContent: 'space-between',
       }}>
       <View>
-        <Text style={styles.label}>Your gender</Text>
+        <Text style={[styles.label, {marginTop: 20}]}>Your gender</Text>
         <Controller
           control={control}
           render={({field: {onChange, value}}) => (
@@ -165,21 +162,29 @@ const UserDetailsForm = () => {
               );
             }}
             name="dob"
+            rules={{required: 'Dob is required'}}
           />
+          {errors.dob && <Text style={styles.error}>{errors.dob.message}</Text>}
         </View>
+
+        <Text style={styles.label}>Your location</Text>
         <Controller
           control={control}
           render={({field: {onChange, value}}) => (
-            <Input
-              name="Location"
-              placeholder="Pune"
-              onChangeText={value => onChange(value)}
+            <RNPickerSelect
+              onValueChange={value => onChange(value)}
+              items={location.map(item => {
+                return {label: item.name, value: item.name};
+              })}
               value={value}
-              labelStyle={styles.label}
             />
           )}
           name="location"
+          rules={{required: 'Please select location and try again'}}
         />
+        {errors.location && (
+          <Text style={styles.error}>{errors.location.message}</Text>
+        )}
       </View>
       <View>
         <Button
@@ -218,6 +223,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 5,
     paddingRight: 25,
+  },
+  error: {
+    color: 'red',
+    marginBottom: 10,
   },
 });
 

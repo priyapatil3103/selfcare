@@ -40,7 +40,6 @@ const StartScreen = () => {
           navigation.navigate('userDetails');
         }}
         label="Get Started"
-        style={{marginBottom: 20}}
       />
     </View>
   );

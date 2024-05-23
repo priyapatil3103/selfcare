@@ -48,24 +48,20 @@ const DoctorDetailsScreen = () => {
   const [date, setDate] = useState<string | undefined>(selectedDate);
   const [slot, setSlot] = useState<number | undefined>(selectedSlot);
 
-  console.log('id', id);
-
   const appointmentButton = (title: string, calledFor: 'book' | 'cancel') => {
     return (
       <TouchableOpacity
         onPress={() => {
-          if (calledFor === 'book') {
+          if (calledFor === 'book' && date && slot) {
             navigation.navigate('appointmentConfirm', {
               docData,
-              selectedDate,
-              selectedSlot,
+              selectedDate: date,
+              selectedSlot: slot,
             });
           } else {
-            console.log('appointmentId', appointmentId);
             api
               .post(`/appointment/${appointmentId}`)
               .then(res => {
-                console.log('rrrr', res);
                 navigation.navigate('home');
               })
               .catch(err => {
@@ -109,8 +105,7 @@ const DoctorDetailsScreen = () => {
   const getDoctorDetails = useCallback(async () => {
     if (id) {
       try {
-        const res = await api.get(`http://192.168.31.242:3005/doctor/${id}`);
-        console.log('res', res);
+        const res = await api.get(`doctor/${id}`);
         setDocData(res.data);
       } catch (err) {
         console.log(err);
@@ -129,7 +124,6 @@ const DoctorDetailsScreen = () => {
   }
 
   if (docData) {
-    console.log('called');
     return (
       <View style={{flex: 1}}>
         <View
@@ -141,7 +135,6 @@ const DoctorDetailsScreen = () => {
           }}>
           <TouchableOpacity
             onPress={() => {
-              console.log('a');
               navigation.goBack();
             }}
             style={{
@@ -221,7 +214,7 @@ const DoctorDetailsScreen = () => {
               renderItem={({item}) => {
                 const month = dayjs(item).format('MMM');
                 const dateToDisplay = dayjs(item).get('date');
-                console.log('ddddd', date);
+
                 return (
                   <TouchableOpacity
                     onPress={() => {

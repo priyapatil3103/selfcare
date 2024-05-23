@@ -30,12 +30,14 @@ const HomeScreen = () => {
 
   const {userDetails} = useUser();
 
+  console.log('userDetails', userDetails);
+
   const fetchData = async () => {
     try {
-      const res = await api.get('http://192.168.31.242:3005/doctors-types');
+      const res = await api.get('doctors-types');
       setDoctorTypes(res.data);
 
-      const response = await api.get('http://192.168.31.242:3005/doctors');
+      const response = await api.get('doctors');
 
       setDoctors(response.data);
     } catch (err) {
@@ -48,18 +50,23 @@ const HomeScreen = () => {
   }, []);
 
   useEffect(() => {
-    if (userDetails && userDetails.id) {
-      console.log('ud', userDetails.id);
-      api
-        .get(`/appointments/${userDetails.id}`)
-        .then(res => {
-          console.log('rrrr', res.data[1]);
-          setAppointments(res.data);
-        })
-        .catch(() => {
-          console.log(err);
-        });
-    }
+    const unsubscribe = navigation.addListener('focus', () => {
+      if (userDetails && userDetails.id) {
+        api
+          .get(`appointments/${userDetails.id}`)
+          .then(res => {
+            console.log('rrrr', res.data);
+            setAppointments(res.data);
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      }
+    });
+
+    return () => {
+      unsubscribe;
+    };
   }, []);
 
   return (
@@ -119,6 +126,22 @@ const HomeScreen = () => {
         }}
         value={searchText}
       />
+      <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+        {selectedCategories.map(item => {
+          return (
+            <Text
+              style={{
+                backgroundColor: '#EFF2F1',
+                borderRadius: 10,
+                padding: 5,
+                margin: 5,
+                color: 'grey',
+              }}>
+              #{item}
+            </Text>
+          );
+        })}
+      </View>
       <View>
         {appointments ? (
           <>
@@ -132,7 +155,7 @@ const HomeScreen = () => {
               <Text>See all</Text>
             </View>
             {appointments.map((item, index) => {
-              console.log('i', item.date, item.time);
+              console.log('item', item);
               if (index < 2) {
                 return (
                   <TouchableOpacity
@@ -145,39 +168,54 @@ const HomeScreen = () => {
                       });
                     }}
                     style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
                       backgroundColor: '#6295E2',
                       padding: 10,
                       borderRadius: 10,
                       margin: 10,
                     }}>
-                    <Icon name="calendar" color="white" />
-                    <Text style={styles.appointmentText}>{item.date}</Text>
-                    <Icon name="clock" color="white" />
-                    <Text style={styles.appointmentText}>{item.time}</Text>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                      }}>
+                      <Text style={{color: 'white'}}>{item.name}</Text>
+                      <Text style={{color: 'white'}}>{item.ratings}</Text>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginTop: 10,
+                      }}>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                        }}>
+                        <Icon name="calendar" color="white" />
+                        <Text style={styles.appointmentText}>{item.date}</Text>
+                        <Icon name="clock" color="white" />
+                        <Text style={styles.appointmentText}>{item.time}</Text>
+                      </View>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'flex-end',
+                        }}>
+                        <Text style={{color: 'white'}}>{item.currency}</Text>
+                        <Text style={{marginLeft: 5, color: 'white'}}>
+                          {item.fees}
+                        </Text>
+                      </View>
+                    </View>
                   </TouchableOpacity>
                 );
               }
             })}
           </>
         ) : null}
-      </View>
-
-      <View>
-        {selectedCategories.map(item => {
-          return (
-            <Text
-              style={{
-                backgroundColor: 'grey',
-                borderRadius: 10,
-                padding: 5,
-                margin: 5,
-              }}>
-              #{item}
-            </Text>
-          );
-        })}
       </View>
 
       <Text style={styles.title}>Categories</Text>

@@ -4,16 +4,22 @@ import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import Logo from '../images/svg/logo.svg';
 import {RootStackParamList} from '../types';
+import {useUser} from '../utils/userAuth';
 
 type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
 
 const SplashScreen = () => {
   const navigation = useNavigation<NavigationProps>();
+  const user = useUser();
   useEffect(() => {
     setTimeout(() => {
-      navigation.navigate('start');
+      if (user.userDetails) {
+        navigation.navigate('signIn');
+      } else {
+        navigation.navigate('start');
+      }
     }, 1000);
-  }, [navigation]);
+  }, []);
 
   return (
     <View

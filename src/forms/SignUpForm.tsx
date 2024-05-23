@@ -40,8 +40,6 @@ const SignUpForm: React.FC<{navigation: NavigationProps}> = ({navigation}) => {
     if (userData) {
       const userDeatils = JSON.parse(userData);
 
-      console.log('userData', userDeatils);
-      console.log(data);
       api
         .post('/auth/register', {
           name: data.fullName,
@@ -49,16 +47,12 @@ const SignUpForm: React.FC<{navigation: NavigationProps}> = ({navigation}) => {
           password: data.password,
           gender: userDeatils.gender,
           birthday: userDeatils.dob,
-          location: {
-            lat: 12333,
-            lng: 323232,
-            name: 'Pune, India',
-          },
+          location: userDeatils.location,
         })
         .then(res => {
-          console.log('res signup', res.data);
-          const {id, name, email} = res.data;
-          setUserDetails({id: id, name, email});
+          console.log(res);
+          const {id, name, email, location} = res.data;
+          setUserDetails({id: id, name, email, location});
           navigation.navigate('otp');
         })
         .catch(err => {

@@ -15,7 +15,6 @@ type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
 
 const PaymentScreen = () => {
   const routes = useRoute();
-  console.log(routes.params);
   const {id, selectedDate, selectedSlot} = routes.params;
   const insets = useSafeAreaInsets();
   const {userDetails} = useUser();

@@ -1,22 +1,17 @@
 import React from 'react';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import Button from '../components/Button';
 import {useUser} from '../utils/userAuth';
-import {RootStackParamList} from '../types';
-import {Screen} from 'react-native-screens';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
 const UsersScreen = () => {
-  const {setUserDetails} = useUser();
-  const navigation = useNavigation<NavigationProps>();
+  const {setIsLoggedIn} = useUser();
 
   return (
     <Button
       label="logout"
       onPress={() => {
-        setUserDetails(null);
-        navigation.navigate('main', {screen: 'signIn'});
+        setIsLoggedIn(false);
+        AsyncStorage.removeItem('userToken');
       }}
     />
   );

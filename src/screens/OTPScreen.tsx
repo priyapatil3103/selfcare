@@ -16,7 +16,7 @@ const OTPScreen = () => {
   const otpInputs = useRef<TextInput[]>([]);
   const navigation = useNavigation<NavigationProps>();
 
-  const {userDetails} = useUser();
+  const {userDetails, setIsLoggedIn} = useUser();
 
   const handleChangeOTP = (index: number, value: string) => {
     const newOTP = [...otp];
@@ -28,20 +28,23 @@ const OTPScreen = () => {
     }
   };
 
-  const verifyOtp = () => {
-    api
-      .post('http://192.168.31.242:3005/auth/verify', {
-        userId: userDetails?.id,
-        otp: otp.join('').toString(),
-      })
-      .then(res => {
-        AsyncStorage.setItem('userToken', res.data.access_token).then(() => {
-          navigation.navigate('main');
-        });
-      })
-      .catch(err => {
-        console.log(err);
-      });
+  const verifyOtp = async () => {
+    const res = await api.post('auth/verify', {
+      userId: userDetails?.id,
+      otp: otp.join('').toString(),
+    });
+    await AsyncStorage.setItem('userToken', res.data.access_token).then(() => {
+      setIsLoggedIn(true);
+    });
+    await AsyncStorage.setItem(
+      'userDetails',
+      JSON.stringify({
+        id: res.data.id,
+        name: res.data.name,
+        email: res.data.email,
+        location: res.data.location,
+      }),
+    );
   };
 
   return (

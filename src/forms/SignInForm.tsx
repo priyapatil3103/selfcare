@@ -5,17 +5,17 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useForm, Controller} from 'react-hook-form';
 import Input from '../components/Input';
 import Button from '../components/Button';
-import {RootStackParamList} from '../types';
+import {HomeStackParamList} from '../types';
 import api from '../api';
 import {useUser} from '../utils/userAuth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
+type NavigationProps = NativeStackNavigationProp<HomeStackParamList>;
 type FormData = {email: string; password: string};
 
 const SignInForm = () => {
   const navigation = useNavigation<NavigationProps>();
-  const {setUserDetails} = useUser();
+  const {setUserDetails, setIsLoggedIn} = useUser();
 
   const {
     control,
@@ -32,12 +32,22 @@ const SignInForm = () => {
     });
 
     await AsyncStorage.setItem('userToken', res.data.access_token);
+    await AsyncStorage.setItem(
+      'userDetails',
+      JSON.stringify({
+        id: res.data.id,
+        name: res.data.name,
+        email: res.data.email,
+        location: res.data.location,
+      }),
+    );
     setUserDetails({
       id: res.data.id,
       name: res.data.name,
       email: res.data.email,
+      location: res.data.location,
     });
-    navigation.navigate('main');
+    setIsLoggedIn(true);
   };
 
   return (

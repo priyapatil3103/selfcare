@@ -1168,7 +1168,7 @@ PODS:
     - React-utils (= 0.74.1)
   - RNCAsyncStorage (1.23.1):
     - React-Core
-  - RNCPicker (2.7.5):
+  - RNCPicker (2.7.6):
     - React-Core
   - RNDateTimePicker (8.0.1):
     - React-Core
@@ -1446,7 +1446,7 @@ SPEC CHECKSUMS:
   React-utils: 3285151c9d1e3a28a9586571fc81d521678c196d
   ReactCommon: f42444e384d82ab89184aed5d6f3142748b54768
   RNCAsyncStorage: 826b603ae9c0f88b5ac4e956801f755109fa4d5c
-  RNCPicker: 3e2c37a8328f368ce14da050cdc8231deb5fc9f9
+  RNCPicker: f58e790450cb0a74c09dd1c677bd1de41a5741b9
   RNDateTimePicker: b6a9b35a785ecbe12b4e7d6de5439d0aa4614146
   RNScreens: b32a9ff15bea7fcdbe5dff6477bc503f792b1208
   RNSVG: 43b64ed39c14ce830d840903774154ca0c1f27ec

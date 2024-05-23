@@ -41,3 +41,5 @@ export type HomeStackParamList = {
 };
 
 export type BottomTabParamsList = {homeTab: undefined; user: undefined};
+
+export type Location = {lat: string; lng: string; name: string};
